@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>2022.5.13 108题</title>
+      <link href="/2022/05/13/leetcode/108/"/>
+      <url>/2022/05/13/leetcode/108/</url>
+      
+        <content type="html"><![CDATA[<h1 id="题目内容"><a href="#题目内容" class="headerlink" title="题目内容"></a>题目内容</h1><p>给你一个整数数组 nums ，其中元素已经按 <strong>升序</strong> 排列，请你将其转换为一棵 <strong>高度平衡</strong> 二叉搜索树。</p><p><strong>高度平衡</strong> 二叉树是一棵满足「每个节点的左右两个子树的高度差的绝对值不超过 1 」的二叉树。</p><p><strong>示例1</strong></p><p><img src="https://assets.leetcode.com/uploads/2021/02/18/btree1.jpg" alt="img"></p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入：nums = [-10,-3,0,5,9]</span><br><span class="line">输出：[0,-3,9,-10,null,5]</span><br><span class="line">解释：[0,-10,5,null,-3,null,9] 也将被视为正确答案：</span><br></pre></td></tr></table></figure><p><img src="https://assets.leetcode.com/uploads/2021/02/18/btree2.jpg" alt="img"></p><p><strong>示例2</strong></p><p><img src="https://assets.leetcode.com/uploads/2021/02/18/btree.jpg" alt="img"></p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入：nums = [1,3]</span><br><span class="line">输出：[3,1]</span><br><span class="line">解释：[1,null,3] 和 [3,1] 都是高度平衡二叉搜索树。</span><br></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= nums.length &lt;= 104</code></li><li><code>-104 &lt;= nums[i] &lt;= 104</code></li><li><code>nums</code> 按 <strong>严格递增</strong> 顺序排列</li></ul><h1 id="本人题解"><a href="#本人题解" class="headerlink" title="本人题解"></a>本人题解</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for a binary tree node.</span></span><br><span class="line"><span class="comment"> * public class TreeNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     TreeNode left;</span></span><br><span class="line"><span class="comment"> *     TreeNode right;</span></span><br><span class="line"><span class="comment"> *     TreeNode() &#123;&#125;</span></span><br><span class="line"><span class="comment"> *     TreeNode(int val) &#123; this.val = val; &#125;</span></span><br><span class="line"><span class="comment"> *     TreeNode(int val, TreeNode left, TreeNode right) &#123;</span></span><br><span class="line"><span class="comment"> *         this.val = val;</span></span><br><span class="line"><span class="comment"> *         this.left = left;</span></span><br><span class="line"><span class="comment"> *         this.right = right;</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> TreeNode <span class="title function_">sortedArrayToBST</span><span class="params">(<span class="type">int</span>[] nums)</span> &#123;</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">root</span> <span class="operator">=</span> travel(nums, <span class="number">0</span>, nums.length - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> TreeNode <span class="title function_">travel</span><span class="params">(<span class="type">int</span>[] nums,<span class="type">int</span> left,<span class="type">int</span> right)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (left&gt;right) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">mid</span> <span class="operator">=</span> (left+right)/<span class="number">2</span>;</span><br><span class="line">        <span class="type">TreeNode</span> <span class="variable">root</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TreeNode</span>(nums[mid]);</span><br><span class="line">        root.left = travel(nums,left,mid-<span class="number">1</span>);</span><br><span class="line">        root.right = travel(nums,mid+<span class="number">1</span>,right);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="做题感想"><a href="#做题感想" class="headerlink" title="做题感想"></a>做题感想</h1><p>首先是递归函数的参数，因为我们需要用到多的参数，所以我们要重新定义一个递归函数出来。</p><p>其他的与普通递归函数无异。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>2022.5.9 669题</title>
       <link href="/2022/05/09/leetcode/669/"/>
       <url>/2022/05/09/leetcode/669/</url>
