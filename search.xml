@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>2022.5.15 77题</title>
+      <link href="/2022/05/15/leetcode/77/"/>
+      <url>/2022/05/15/leetcode/77/</url>
+      
+        <content type="html"><![CDATA[<h1 id="题目内容"><a href="#题目内容" class="headerlink" title="题目内容"></a>题目内容</h1><p>给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。</p><p>你可以按 <strong>任何顺序</strong> 返回答案。</p><p><strong>示例 1：</strong></p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入：n = 4, k = 2</span><br><span class="line">输出：</span><br><span class="line">[</span><br><span class="line">  [2,4],</span><br><span class="line">  [3,4],</span><br><span class="line">  [2,3],</span><br><span class="line">  [1,2],</span><br><span class="line">  [1,3],</span><br><span class="line">  [1,4],</span><br><span class="line">]</span><br></pre></td></tr></table></figure><p><strong>示例2</strong></p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入：n = 1, k = 1</span><br><span class="line">输出：[[1]]</span><br></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= n &lt;= 20</code></li><li><code>1 &lt;= k &lt;= n</code></li></ul><h1 id="本人题解"><a href="#本人题解" class="headerlink" title="本人题解"></a>本人题解</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; <span class="title function_">combine</span><span class="params">(<span class="type">int</span> n, <span class="type">int</span> k)</span> &#123;</span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; res = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span> (n==<span class="number">0</span>)<span class="keyword">return</span> res;</span><br><span class="line">        ArrayList&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        dfsa(res,list,n,k,<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">dfsa</span><span class="params">(List&lt;List&lt;Integer&gt;&gt; res,List&lt;Integer&gt; list,<span class="type">int</span> n,<span class="type">int</span> k,<span class="type">int</span> begin)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (list.size()==k) &#123;</span><br><span class="line">            List&lt;Integer&gt; list1 = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;(list);</span><br><span class="line">            res.add(list1);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> begin; i &lt;= n; i++) &#123;</span><br><span class="line">            list.add(i);</span><br><span class="line">            dfsa(res,list,n,k,i+<span class="number">1</span>);</span><br><span class="line">            list.remove(list.size()-<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h1 id="做题感谢"><a href="#做题感谢" class="headerlink" title="做题感谢"></a>做题感谢</h1><p>回溯法这类题做多了十分简单</p><p>在for那里，设置begin有点学问，可以多试试</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>2022.5.13 108题</title>
       <link href="/2022/05/13/leetcode/108/"/>
       <url>/2022/05/13/leetcode/108/</url>
