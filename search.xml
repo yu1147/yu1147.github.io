@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>spring cloud中nacos config的一些坑</title>
+      <link href="/2022/06/29/spring/nacosconfig/"/>
+      <url>/2022/06/29/spring/nacosconfig/</url>
+      
+        <content type="html"><![CDATA[<p>我在弄nacos config按照网上的流程打了一遍，发现并没有在日志弹出配置文件的名字，可能是版本的问题<br>解决方法：</p><figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;spring-cloud-starter-bootstrap&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">3.1</span><span class="number">.3</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure><p>之后便能在控制台的日志看到<br><img src="https://s3.bmp.ovh/imgs/2022/06/29/c0f28361f6dbe63e.png" alt="img"><br>无视第三行，直接看第二行nacos相关的，复制gulimall-coupon.properties即可</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 后端学习 </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>2022.5.15 77题</title>
       <link href="/2022/05/15/leetcode/77/"/>
       <url>/2022/05/15/leetcode/77/</url>
