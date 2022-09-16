@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>2022.9.16 剑指43题</title>
+      <link href="/2022/09/16/leetcode/jianzhi43/"/>
+      <url>/2022/09/16/leetcode/jianzhi43/</url>
+      
+        <content type="html"><![CDATA[<h1 id="题目内容"><a href="#题目内容" class="headerlink" title="题目内容"></a>题目内容</h1><p>输入一个整数 n ，求1～n这n个整数的十进制表示中1出现的次数。</p><p>例如，输入12，1～12这些整数中包含1 的数字有1、10、11和12，1一共出现了5</p><p><strong>示例1：</strong></p><figure class="highlight console"><table><tr><td class="code"><pre><span class="line">输入：n = 12</span><br><span class="line">输出：5</span><br></pre></td></tr></table></figure><p><strong>示例2：</strong></p><figure class="highlight console"><table><tr><td class="code"><pre><span class="line">输入：n = 13</span><br><span class="line">输出：6</span><br></pre></td></tr></table></figure><p><strong>限制：</strong></p><ul><li><code>1 &lt;= n &lt; 2^31</code></li></ul><h2 id="解法讲解："><a href="#解法讲解：" class="headerlink" title="解法讲解："></a>解法讲解：</h2><p>该题十分独特所以放上来记录一下</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>spring cloud中nacos config的一些坑</title>
       <link href="/2022/06/29/spring/nacosconfig/"/>
       <url>/2022/06/29/spring/nacosconfig/</url>
