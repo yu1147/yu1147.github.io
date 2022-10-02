@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>2022.10.2 剑指43题</title>
+      <link href="/2022/10/02/leetcode/jianzhi56/"/>
+      <url>/2022/10/02/leetcode/jianzhi56/</url>
+      
+        <content type="html"><![CDATA[<h1 id="题目内容"><a href="#题目内容" class="headerlink" title="题目内容"></a>题目内容</h1><p>一个整型数组 <code>nums</code> 里除两个数字之外，其他数字都出现了两次。请写程序找出这两个只出现一次的数字。要求时间复杂度是O(n)，空间复杂度是O(1)。</p><p><strong>示例1</strong></p><figure class="highlight console"><table><tr><td class="code"><pre><span class="line">输入：nums = [4,1,4,6]</span><br><span class="line">输出：[1,6] 或 [6,1]</span><br></pre></td></tr></table></figure><p><strong>示例2</strong></p><figure class="highlight console"><table><tr><td class="code"><pre><span class="line">输入：nums = [1,2,10,4,1,4,3,3]</span><br><span class="line">输出：[2,10] 或 [10,2]</span><br></pre></td></tr></table></figure><h2 id="解法讲解及心得"><a href="#解法讲解及心得" class="headerlink" title="解法讲解及心得"></a>解法讲解及心得</h2><p>这题可以说是leetcode136题的进阶版<a href="https://leetcode.cn/problems/single-number/">136. 只出现一次的数字 - 力扣（LeetCode）</a></p><p>同时也不得不让人感慨位运算的神奇，位运算可以用来做快速幂计算，同时还可以用在树状数组还有本题的查找不同的题目中。</p><p>在讲这道题之前想先记下有意思的几种位运算的方法</p><h3 id="异或"><a href="#异或" class="headerlink" title="异或 ^"></a>异或 ^</h3><p>异或运算有以下三个性质。</p><ol><li>任何数和 00 做异或运算，结果仍然是原来的数，即a⊕0&#x3D;a</li><li>任何数和其自身做异或运算，结果是 0，即 a⊕a&#x3D;0</li><li>异或运算满足交换律和结合律，即 a⊕b⊕a&#x3D;b⊕a⊕a&#x3D;b⊕(a⊕a)&#x3D;b⊕0&#x3D;b</li></ol><p>可以看到这个异或运算在寻找只出现一次的数字，能起到关键作用，我们只需要将数组从头异或到最后，便可以得到我们的答案。</p><h3 id="lowbit"><a href="#lowbit" class="headerlink" title="lowbit"></a>lowbit</h3><p>lowbit这个概念我是从树状数组知道的，树状数组是一个求前缀和和单点更新的数组，查找和更新的概率都是O（logn），但这类数组实际上除了特定题，我觉得一般很少看到，暂时做了解即可，它出现在<a href="https://leetcode.cn/problems/shu-zu-zhong-de-ni-xu-dui-lcof/?favorite=xb9nqhhg">剑指 Offer 51. 数组中的逆序对 - 力扣（LeetCode）</a>可以从这道题了解树状数组的用法。</p><p>言归正传，我们假设一个数字x，lowbit运算为x&amp;（-x）这个运算可以得到x二进制表示中最后的“1”，这确实十分神奇，为什么不需要知道，知道他能实现这个效果就行，比如010100经过lowbit运输为000100；</p><p>在了解完这两个解题技巧之后，我们开始正式讲这道题的解法：</p><ol><li><strong>我们首先对整个数组进行异或运算，如下公式：</strong></li></ol><p><em>a</em>⊕<em>a</em>⊕<em>b</em>⊕<em>b</em>⊕…⊕<em>x</em>⊕<em>y</em></p><p>&#x3D;0⊕0⊕…⊕<em>x</em>⊕<em>y</em></p><p>&#x3D;<em>x</em>⊕<em>y</em></p><p>&#x3D;ret</p><p>很明显我们会发现这样没办法得到两个数字，而是得到他们的异或。但是巧妙的地方就在于我们知道x和y是必不相等的，所以他们两的异或得到的二进制的值必然不为0，于是有了下面的步骤</p><ol start="2"><li><strong>对ret进行lowbit运算</strong></li></ol><p>我们已经知道了ret不为0，然后我们使用lowbit能得到ret最靠后的“1”，那么这代表什么呢？</p><p>这代表x和y的二进制表达在这一位上他们是不一样的，要么x在这一位上为0，y为1；要么相反x在这一位上是1，y为0。</p><p>div&#x3D;ret&amp;（-ret）</p><p>有了这样的运算之后，我们看第三个步骤</p><ol start="3"><li><strong>对原数组进行分组计算</strong></li></ol><p>这一步简直是神来之笔，只能说没做过这类型的题简直不可能想出这个方法，有天赋的人除外了。</p><p>我们这一步要做到两个效果</p><ul><li>相同的数字必定在一组</li><li>返回的两个不同数字必定在不同的组</li></ul><p>我们通过lowbit运算之后得到的div，也就是最靠后的“1”的数字，用来和数组中的所有数进行与（&amp;）运算，将这一位上与div相同的分到一组，不相同的分到另一组。很明显，我们已经巧妙的将两个不同数字分开的同时，将相同的数字放到了一组。最后我们能得到两个数字，这便是题目要的答案</p><h1 id="本人题解"><a href="#本人题解" class="headerlink" title="本人题解"></a>本人题解</h1><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span>[] singleNumbers(<span class="type">int</span>[] nums) &#123;</span><br><span class="line">        <span class="comment">// 我们首先对整个数组进行异或运算</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">ret</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> num : nums) &#123;</span><br><span class="line">            ret ^= num;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//对ret进行lowbit运算</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">div</span> <span class="operator">=</span> ret &amp; (-ret);</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">0</span>, b = <span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//对原数组进行分组计算</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> num : nums) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((div&amp;num)==<span class="number">0</span>) &#123;</span><br><span class="line">                a ^= num;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                b ^= num;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">int</span>[]&#123;a,b&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 刷题笔记 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> java </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>2022.9.16 剑指43题</title>
       <link href="/2022/09/16/leetcode/jianzhi43/"/>
       <url>/2022/09/16/leetcode/jianzhi43/</url>
