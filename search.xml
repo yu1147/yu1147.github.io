@@ -87,6 +87,35 @@
     
     
     <entry>
+      <title>nginx负载均衡</title>
+      <link href="/2023/01/15/spring/nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
+      <url>/2023/01/15/spring/nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</url>
+      
+        <content type="html"><![CDATA[<h1 id="如何用nginx做负载均衡"><a href="#如何用nginx做负载均衡" class="headerlink" title="如何用nginx做负载均衡"></a>如何用nginx做负载均衡</h1><h2 id="举一个实际的应用场景"><a href="#举一个实际的应用场景" class="headerlink" title="举一个实际的应用场景"></a>举一个实际的应用场景</h2><p>假设我两台机器的后端（包括端口号）分别是192.168.8.171:8082和192.168.8.176:8083，nginx部署在192.168.8.171</p><p>那么nginx的配置应该是</p><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">upstream backend_servers &#123;</span><br><span class="line">    server 192.168.8.171:8082;</span><br><span class="line">    server 192.168.8.176:8083;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name 192.168.8.171;  <span class="comment"># 使用IP地址代替域名</span></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://backend_servers;</span><br><span class="line">        proxy_set_header Host <span class="variable">$host</span>;</span><br><span class="line">        proxy_set_header X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>在这个配置文件中，我们将<code>server_name</code>指令设置为Nginx服务器的IP地址<code>192.168.8.171</code>，这样Nginx会根据IP地址匹配到对应的虚拟主机进行处理。</p><p>需要注意的是，如果你想通过公网访问这两台后端服务器，需要将后端服务器的端口号开放到公网，并在防火墙中设置相应的规则。同时，你还需要保证这两台服务器的IP地址是公网可访问的。</p><p>Nginx的负载均衡默认使用的是轮询算法，也可以根据实际情况选择其他算法，例如ip_hash算法、least_conn算法等。另外，在生产环境中，还需要根据实际情况配置Nginx的缓存、超时、错误处理等相关参数，以保证系统的稳定性和可靠性。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 后端学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 后端开发 </tag>
+            
+            <tag> nginx </tag>
+            
+            <tag> 负载均衡 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>部署多项目时的nginx配置</title>
       <link href="/2022/12/20/spring/nginx%E9%83%A8%E7%BD%B2/"/>
       <url>/2022/12/20/spring/nginx%E9%83%A8%E7%BD%B2/</url>
