@@ -91,36 +91,9 @@
             
             <tag> 后端开发 </tag>
             
-            <tag> docker </tag>
-            
             <tag> mysql </tag>
             
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>双证书与单证书</title>
-      <link href="/2023/02/24/http/%E5%8F%8C%E8%AF%81%E4%B9%A6%E4%B8%8E%E5%8D%95%E8%AF%81%E4%B9%A6/"/>
-      <url>/2023/02/24/http/%E5%8F%8C%E8%AF%81%E4%B9%A6%E4%B8%8E%E5%8D%95%E8%AF%81%E4%B9%A6/</url>
-      
-        <content type="html"><![CDATA[<p>待更新<br>占坑，之后补全<br>涉及签名证书、加密证书还有PKI双证书体系的作用、应用场景<br>单证书在http上的情况</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 后端学习 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 后端开发 </tag>
-            
-            <tag> 证书 </tag>
+            <tag> docker </tag>
             
         </tags>
       
