@@ -1,0 +1,338 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>联合索引的那些事以及索引失效 | 陈诗杰的博客</title><meta name="keywords" content="后端开发,mysql"><meta name="author" content="陈诗杰"><meta name="copyright" content="陈诗杰"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="mysql 索引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="联合索引的那些事以及索引失效">
+<meta property="og:url" content="https://yu1147.github.io/2023/06/07/mysql/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="陈诗杰的博客">
+<meta property="og:description" content="mysql 索引">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s3.bmp.ovh/imgs/2023/02/25/1fdcf4672d70f766.jpg">
+<meta property="article:published_time" content="2023-06-07T09:46:00.000Z">
+<meta property="article:modified_time" content="2023-06-07T14:33:39.805Z">
+<meta property="article:author" content="陈诗杰">
+<meta property="article:tag" content="后端开发">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.bmp.ovh/imgs/2023/02/25/1fdcf4672d70f766.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://yu1147.github.io/2023/06/07/mysql/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '联合索引的那些事以及索引失效',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-06-07 22:33:39'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.1.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://s3.bmp.ovh/imgs/2023/02/25/1fdcf4672d70f766.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/aboutme/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">陈诗杰的博客</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 链接</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></li><li><a class="site-page child" href="/aboutme/"><i class="fa-fw fas fa-heart"></i><span> 关于我</span></a></li></ul></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">联合索引的那些事以及索引失效</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-06-07T09:46:00.000Z" title="发表于 2023-06-07 17:46:00">2023-06-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-06-07T14:33:39.805Z" title="更新于 2023-06-07 22:33:39">2023-06-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%90%8E%E7%AB%AF%E5%AD%A6%E4%B9%A0/">后端学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="联合索引未击中相关问题"><a href="#联合索引未击中相关问题" class="headerlink" title="联合索引未击中相关问题"></a>联合索引未击中相关问题</h1><p>场景是这样的，我有一场登录日志表，我想查出某个时间点之后某个用户登录的行数。（feed流）</p>
+<p>常见的sql查询为：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;chuhuo001&#x27;</span> <span class="keyword">and</span> login_time <span class="operator">&gt;=</span><span class="string">&#x27;2023-04-30 01:38:20&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>假设表中没有索引的话，我们查询一下这个执行语句的执行计划，那么怎么执行呢，很简单，只需要在查询语句前面加个<code>explain</code>即可</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">explain <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;chuhuo001&#x27;</span> <span class="keyword">and</span> login_time <span class="operator">&gt;=</span><span class="string">&#x27;2023-04-30 01:38:20&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/f25be8dd5504b6b3.png" alt="image-20230607205904772"></p>
+<p>那么分析一下这个执行计划，比较重要的点有type还有key还有extra这三个字段，type为all说明是全表查询，key为空，表示没有用到索引，extra有using where说明了使用到了where。</p>
+<p>那么为了更直观点，我们可以查询一下这个语句的耗时</p>
+<p>使用下面语句可以查询</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">show</span> profiles;</span><br></pre></td></tr></table></figure>
+
+<p>查询得到结果如下，单位为秒，也就是大约0.35ms</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/ce343b555770ac16.png" alt="image-20230607212131670"></p>
+<p>看起来很小，但是当表变大了这个时间会越来越大，很有可能导致慢查询。下面我们开始优化这个sql语句</p>
+<h2 id="添加索引"><a href="#添加索引" class="headerlink" title="添加索引"></a>添加索引</h2><p>因为在这个查询语句中我们用到了两个条件查询，因此我们可以首先联想到的是使用联合索引（user_name和login_time）</p>
+<p>穿插点小知识</p>
+<blockquote>
+<p>怎么添加和删除索引呢？</p>
+</blockquote>
+<p>很简单使用下面的语句即可</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span> 添加联合索引</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> sys_logininfor <span class="keyword">add</span> index firstindex(user_name, login_time);</span><br><span class="line"><span class="operator">/</span><span class="operator">/</span> 删除索引</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> sys_logininfor <span class="keyword">drop</span> index firstindex;</span><br></pre></td></tr></table></figure>
+
+<p>那么有的同学可能会问万一忘记索引名了，可怎么删除，很简单，使用下面这个语句即可。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">show</span> index <span class="keyword">from</span> sys_logininfor;</span><br></pre></td></tr></table></figure>
+
+<p>那么我们加上了联合索引之后，看看执行计划和时间</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/9ba132575943cf6a.png" alt="image-20230607211852379"></p>
+<p>执行计划如下图，很明显我们可以看到type为range也就是范围查找的意思，key为firstindex，说明使用到了索引。而extra为using index codition这个是索引下推的意思可以减少回表次数，是mysql5.6之后引进的一个优化技术。</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/22991a4ba3c3025e.png" alt="image-20230607212202006"></p>
+<p>他的执行时长大概为0.25ms比上面的sql语句略小，规模大点的数据会比较明显。（可能有的同学实验的时候，上面的时长可能比这个时长更短，一般来说建议还是多试几次然后取平均次，同时因为使用索引的时候是会多个回表的时间的，数据量比较少的情况下，确实会出现回表后时长反而大于全表查询的时间）。</p>
+<blockquote>
+<p>联合索引还适合什么查询语句呢</p>
+</blockquote>
+<p>特地留下这个问题，是想提醒大家并不是只有where后面带and才会用上联合索引，有时候where和order by的时候也可以加上联合索引</p>
+<p>比如</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">order</span> <span class="keyword">by</span> login_time  ;</span><br></pre></td></tr></table></figure>
+
+<p>大家不妨可以试一下</p>
+<h2 id="索引未击中"><a href="#索引未击中" class="headerlink" title="索引未击中"></a>索引未击中</h2><p>以后到这里就结束了吗，还是一样的业务场景，这次我想查admin用户按时间排序的全部登录数据。先说一下前提表的大部分登录用户都是admin少数是其他用户。</p>
+<p>那么这个sql一样很好写</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor  <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">order</span> <span class="keyword">by</span> login_time;</span><br></pre></td></tr></table></figure>
+
+<p>那么问题来了他会使用到索引吗，答案是不会的（至少当数据过多，导致很多数据没能过滤掉的时候是不会的）。它的执行计划如下</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/f56edba702635807.png" alt="image-20230607215639068"></p>
+<p>我们可以发现type为all，key为null，已经是全表查询了，注意在extra还有using filesort。通常使用order by的时候会出现这个字眼。filesort主要用于查询数据结果集的排序操作。我们再看一下时间</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/88489540926302a2.png" alt="image-20230607220045792"></p>
+<p>可以看到大概时间为0.67ms</p>
+<p>那这时候如果我们可能就会想着啊没打到索引效率要变差了，实际上并不是的，这是因为mysql优化器已经为我们做了优化，因为索引并不能为我们做过多的过滤，导致回表的数据量很大的时候，mysql就会选择全表查询。这个占比大概在30%左右，也就是你查到的数据mysql估计已经有全表的30%，就直接全表查询。</p>
+<h2 id="强制索引"><a href="#强制索引" class="headerlink" title="强制索引"></a>强制索引</h2><p>那如果我们就是执意要用索引呢，其实也是用办法的，值需要使用<code>force index</code>即可</p>
+<p>那么sql语句为</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor  force index (firstindex) <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">order</span> <span class="keyword">by</span> login_time  ;</span><br></pre></td></tr></table></figure>
+
+<p>执行计划为：</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/d6b127d594b442d9.png" alt="image-20230607220555516"></p>
+<p>但是重点来了，我们看看耗时：</p>
+<p><img src="https://s3.bmp.ovh/imgs/2023/06/07/4ee7367c8e9a0b49.png" alt="image-20230607220123386"></p>
+<p>此时便会发现耗时变多了。所以优化器优化不是没有道理的。不过有的时候优化器也不一定对就是了，大家还是按情况来判断。</p>
+<h2 id="具体业务场景优化"><a href="#具体业务场景优化" class="headerlink" title="具体业务场景优化"></a>具体业务场景优化</h2><p>怎么加了索引还能优化呢？其实也不算优化，只是根据具体生产场景做一个优化。一般我们把数据传给前端，不会真的全部传过去，而是会使用分页的方式。</p>
+<p>如下</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor  <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">order</span> <span class="keyword">by</span> login_time <span class="keyword">desc</span> limit <span class="number">0</span>,<span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+
+<p>但是分页索引依旧会出现问题，这里推荐大家看这篇博客<a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_52217130/article/details/129948088">页查询如何优化查询_分页查询的优化_想静静码的博客-CSDN博客</a></p>
+<p>这里简单带过。最主要的问题在于这个sql语句的limit越往后迁移查询速度越慢。我个人使用的方法是类似timeline方法，每次查找的查到最后一个值。然后将其保存下来，往后查询的可以使用<code>where val &gt; lastval</code>提前做一个筛选可以提高查询速度。</p>
+<p>然后还有一种业务场景，只是公司的业务场景，假设我有两个单列索引，一个在where使用了，一个在order by使用了，我想让mysql走where索引，但是mysql选择了走order by索引，这种要怎么做呢？</p>
+<p>比较神奇的方法就是在order by后面加个0</p>
+<p>如下：(<strong>注意与前面的例子不同：这个是user_name和login_time各有一个单列索引无联合索引，如果有联合索引的话，会让索引部分失效，也就是出现using filesort的场景，但user_name不受影响，所以依旧会使用到联合索引</strong>)</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">from</span> sys_logininfor  force index (firstindex) <span class="keyword">where</span> user_name <span class="operator">=</span> <span class="string">&#x27;admin&#x27;</span> <span class="keyword">order</span> <span class="keyword">by</span> login_time<span class="operator">+</span><span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>联合索引是经常会使用到的，诸如抖音、微博feed流中，推拉消息也是经常要使用到user_name还有push_time,我们将这两个做一个联合索引，就很快生成自己的feed_box。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_37968613/article/details/114652178">mysql索引访问方式实践 （const、ref、range、index、all、index merge）_mysql const_c&amp;0xff00的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39654841/article/details/129979903">原理这就是索引下推呀_什么是索引下推_索码理的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_46265572/article/details/125464614">mysql慢查询设置_mysql慢查询时间设置_看完我的名字的人就是默认我是最帅的帅哥了的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/yetaodiao/article/details/127369793">mysql慢查询日志在哪里_叶涛网站推广优化的博客-CSDN博客</a></p>
+<p><a target="_blank" rel="noopener" href="http://mysql.taobao.org/monthly/2015/03/04/">MySQL · 答疑释惑· using filesort VS using temporary</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_52217130/article/details/129948088">页查询如何优化查询_分页查询的优化_想静静码的博客-CSDN博客</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://yu1147.github.io">陈诗杰</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://yu1147.github.io/2023/06/07/mysql/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95/">https://yu1147.github.io/2023/06/07/mysql/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://yu1147.github.io" target="_blank">陈诗杰的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a><a class="post-meta__tags" href="/tags/mysql/">mysql</a></div><div class="post_share"><div class="social-share" data-image="https://s3.bmp.ovh/imgs/2023/02/25/1fdcf4672d70f766.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/gh/overtrue/share.js@master/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/05/01/juc/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"><img class="next-cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">线程池常见面试题个人整理</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/02/25/mysql/next-keylock/" title="next-key lock中一些退化情况"><img class="cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-25</div><div class="title">next-key lock中一些退化情况</div></div></a></div><div><a href="/2023/02/25/spring/%E5%AE%9A%E5%88%B6%E5%8C%96mysql%E5%AE%B9%E5%99%A8/" title="使用docker定制mysql容器"><img class="cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-25</div><div class="title">使用docker定制mysql容器</div></div></a></div><div><a href="/2023/05/01/juc/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" title="线程池常见面试题个人整理"><img class="cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-05-01</div><div class="title">线程池常见面试题个人整理</div></div></a></div><div><a href="/2023/03/06/juc/%E9%94%81%E5%8D%87%E7%BA%A7/" title="synchronized锁升级"><img class="cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-06</div><div class="title">synchronized锁升级</div></div></a></div><div><a href="/2023/04/20/operatingSystem/IO/" title="操作系统中的io模型"><img class="cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-20</div><div class="title">操作系统中的io模型</div></div></a></div><div><a href="/2022/06/29/spring/nacosconfig/" title="spring cloud中nacos config的一些坑"><img class="cover" src="https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-29</div><div class="title">spring cloud中nacos config的一些坑</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="lv-container" data-id="city" data-uid="MTAyMC81NjMyNy8zMjc5MA=="></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://s3.bmp.ovh/imgs/2023/02/25/1fdcf4672d70f766.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">陈诗杰</div><div class="author-info__description">上海大学研究生在读，希望变得更优秀</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">24</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/yu1147"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/yu1147" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="https://space.bilibili.com/3366311?spm_id_from=333.1007.0.0" target="_blank" title=""><i class="fa fa-play-circle"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客，希望我的文章能够帮到你，如果有建议欢迎联系我的qq：1147669839</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95%E6%9C%AA%E5%87%BB%E4%B8%AD%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">联合索引未击中相关问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E7%B4%A2%E5%BC%95"><span class="toc-number">1.1.</span> <span class="toc-text">添加索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E6%9C%AA%E5%87%BB%E4%B8%AD"><span class="toc-number">1.2.</span> <span class="toc-text">索引未击中</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%BA%E5%88%B6%E7%B4%A2%E5%BC%95"><span class="toc-number">1.3.</span> <span class="toc-text">强制索引</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF%E4%BC%98%E5%8C%96"><span class="toc-number">1.4.</span> <span class="toc-text">具体业务场景优化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-number">1.5.</span> <span class="toc-text">其他</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">1.6.</span> <span class="toc-text">参考</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/06/07/mysql/%E8%81%94%E5%90%88%E7%B4%A2%E5%BC%95/" title="联合索引的那些事以及索引失效">联合索引的那些事以及索引失效</a><time datetime="2023-06-07T09:46:00.000Z" title="发表于 2023-06-07 17:46:00">2023-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/05/01/juc/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" title="线程池常见面试题个人整理">线程池常见面试题个人整理</a><time datetime="2023-05-01T02:34:00.000Z" title="发表于 2023-05-01 10:34:00">2023-05-01</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/04/20/operatingSystem/IO/" title="操作系统中的io模型">操作系统中的io模型</a><time datetime="2023-04-20T09:46:00.000Z" title="发表于 2023-04-20 17:46:00">2023-04-20</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/03/06/juc/%E9%94%81%E5%8D%87%E7%BA%A7/" title="synchronized锁升级">synchronized锁升级</a><time datetime="2023-03-06T02:34:00.000Z" title="发表于 2023-03-06 10:34:00">2023-03-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2023/02/25/mysql/next-keylock/" title="next-key lock中一些退化情况">next-key lock中一些退化情况</a><time datetime="2023-02-25T09:46:00.000Z" title="发表于 2023-02-25 17:46:00">2023-02-25</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://s3.bmp.ovh/imgs/2022/05/14/a0239b6e50935332.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By 陈诗杰</div><div class="footer_custom_text">感谢您看到最后</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5/instantpage.min.js" type="module"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu@4/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script>function loadLivere () {
+  if (typeof LivereTower === 'object') {
+    window.LivereTower.init()
+  }
+  else {
+    (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+    })(document, 'script');
+  }
+}
+
+if ('Livere' === 'Livere' || !false) {
+  if (false) btf.loadComment(document.getElementById('lv-container'), loadLivere)
+  else loadLivere()
+}
+else {
+  function loadOtherComment () {
+    loadLivere()
+  }
+}</script></div><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["meta[property=\"og:image\"]","meta[property=\"og:title\"]","meta[property=\"og:url\"]","title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  typeof preloader === 'object' && preloader.initLoading()
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"rect":"opacity:0.7","log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body></html>
